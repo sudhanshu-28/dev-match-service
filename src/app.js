@@ -2,10 +2,21 @@ const express = require("express");
 
 const app = express();
 
+// app.get("/a(bc)?d", (req, res) => {
+//   res.send("ABC  API trigerred");
+// });
+
 // get : This will only handle GET route call to /user
 app.get("/user", (req, res) => {
+  console.log(req.query);
   res.send("Users List API trigerred");
 });
+
+// To handle dynamic routes - fetch parameters
+// app.get("/user/:userId", (req, res) => {
+//   console.log(req.params);
+//   res.send("Users List API trigerred");
+// });
 
 app.post("/user", (req, res) => {
   res.send("User Create API trigerred");
