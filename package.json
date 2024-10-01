@@ -1,0 +1,20 @@
+{
+  "name": "dev-match-service",
+  "version": "1.0.0",
+  "description": "Make Connection for Developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "javascript",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Sudhanshu Rai",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
