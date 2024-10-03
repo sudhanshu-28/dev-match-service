@@ -19,6 +19,11 @@ app.use("/user", userAuth, (req, res) => {
   res.send("Welcome to Home page");
 });
 
+// Login API would not have token, since that need to authenticated then token will generate, so we didnt passed userAuth as middleware in this route
+app.use("/user/login", (req, res) => {
+  res.send("User Logged in Successfully");
+}); // So in this way we can customize out route and get user authenticated based on our requirement and accordingly customize it
+
 app.listen(7777, () => {
   console.log("Server is running on port 7777...");
 });
