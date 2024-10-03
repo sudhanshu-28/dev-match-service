@@ -2,21 +2,29 @@ const express = require("express");
 
 const app = express();
 
-app.use(
-  "/user",
-  (req, res, next) => {
-    console.log("Route Handler 1");
+app.use("/admin", (req, res, next) => {
+  console.log("Entered in this middleware");
+  const token = "xyz";
+  const isAdminAuthorized = token === "xyz";
+
+  if (!isAdminAuthorized) {
+    res.status(401).send("Unauthorized User");
+  } else {
     next();
-  }, // Middleware
-  (req, res, next) => {
-    console.log("Route Handler 2");
-    next();
-  }, // Middleware
-  (req, res, next) => {
-    console.log("Route Handler 5");
-    res.send("API executed successfully from RH5");
-  } // Request Handler - as this function is handling request and sending the response
-);
+  }
+});
+
+app.use("/admin/getAllData", (req, res) => {
+  res.send("All Users List Sent");
+});
+
+app.use("/admin/deleteUser", (req, res) => {
+  res.send("User Deleted");
+});
+
+app.use("/dashboard", (req, res) => {
+  res.send("Welcome to Home page");
+});
 
 app.listen(7777, () => {
   console.log("Server is running on port 7777...");
