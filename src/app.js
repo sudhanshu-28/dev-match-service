@@ -1,18 +1,10 @@
 const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
 
-app.use("/admin", (req, res, next) => {
-  console.log("Entered in this middleware");
-  const token = "xyz";
-  const isAdminAuthorized = token === "xyz";
-
-  if (!isAdminAuthorized) {
-    res.status(401).send("Unauthorized User");
-  } else {
-    next();
-  }
-});
+// Because we had multiple admin API for authentication, hence adminAuth is written seperately and after auth it will be passed to next admin routes for server admin API request
+app.use("/admin", adminAuth);
 
 app.use("/admin/getAllData", (req, res) => {
   res.send("All Users List Sent");
@@ -22,7 +14,8 @@ app.use("/admin/deleteUser", (req, res) => {
   res.send("User Deleted");
 });
 
-app.use("/dashboard", (req, res) => {
+// Because we had single user API for authentication, hence passed userAuth function directly with logic
+app.use("/user", userAuth, (req, res) => {
   res.send("Welcome to Home page");
 });
 
