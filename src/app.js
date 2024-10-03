@@ -4,14 +4,16 @@ const app = express();
 
 app.use(
   "/user",
-  (req, res, next) => {
-    console.log("Route Handler 1");
-    next();
-  },
-  (req, res, next) => {
-    console.log("Route Handler 2");
-    next();
-  },
+  [
+    (req, res, next) => {
+      console.log("Route Handler 1");
+      next();
+    },
+    (req, res, next) => {
+      console.log("Route Handler 2");
+      next();
+    },
+  ],
   (req, res, next) => {
     console.log("Route Handler 3");
     next();
@@ -22,7 +24,7 @@ app.use(
   },
   (req, res, next) => {
     console.log("Route Handler 5");
-    next();
+    res.send("API executed successfully from RH5");
   }
 );
 
