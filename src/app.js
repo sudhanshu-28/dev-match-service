@@ -4,23 +4,21 @@ const User = require("./models/user");
 
 const app = express();
 
-app.post("/signup", async (req, res) => {
-  // Creating new instance of User model
-  const user = new User({
-    firstName: "Akshay",
-    lastName: "Kumar",
-    emailId: "akshay@kumar.com",
-    password: "Kumar@123",
-    age: 54,
-    gender: "Male",
-  });
+// Convert JSON (Readable Stream) into Javascript Object - for all the APIs request for all HTTP methods (use)
+// Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
+app.use(express.json());
 
-  // Recommend way - with All DB operations best practice is to write in try catch
+app.post("/signup", async (req, res) => {
+  console.log(req.body);
+
+  // Creating new instance of User model
+  const user = new User(req.body);
+  // // Recommend way - with All DB operations best practice is to write in try catch
   try {
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
-    console.log("err => ", err);
+    console.log("Error => ", err);
     res.status(500).send("User failed to add.");
   }
 });
