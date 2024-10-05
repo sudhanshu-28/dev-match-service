@@ -23,18 +23,6 @@ app.post("/signup", async (req, res) => {
     console.log("err => ", err);
     res.status(500).send("User failed to add.");
   }
-
-  // Alternative approach two - MY WAY
-  // await user
-  //   .save()
-  //   .then((response) => {
-  //     console.log("response => ", response);
-  //     res.send("User added successfully!");
-  //   })
-  //   .catch((err) => {
-  //     console.log("err => ", err);
-  //     res.status(500).send("User failed to add.");
-  //   });
 });
 
 // Start your sever only when you are connected to Database
