@@ -116,6 +116,35 @@ app.get("/getUserByEmail", async (req, res) => {
   }
 });
 
+app.patch("/user", async (req, res) => {
+  const userId = req?.query?.id;
+  const userData = req?.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(userId, userData, {
+      returnDocument: "after",
+    });
+
+    if (user) {
+      res.send({
+        success: true,
+        message: "User data updated successfully.",
+        data: user,
+      });
+    } else {
+      res.status(400).send({
+        success: false,
+        message: "Something went wrong, failed to update User.",
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Failed to update User due to Internal Server Error.",
+    });
+  }
+});
+
 app.delete("/user", async (req, res) => {
   const userId = req?.query?.id;
 
