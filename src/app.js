@@ -86,25 +86,57 @@ app.get("/getUserById", async (req, res) => {
 app.get("/getUserByEmail", async (req, res) => {
   const userEmailID = req?.query?.emailID;
 
-  const userData = await User.findOne({ emailId: userEmailID });
+  try {
+    const userData = await User.findOne({ emailId: userEmailID });
 
-  if (!userData) {
-    res.status(404).send({
+    if (!userData) {
+      res.status(404).send({
+        success: false,
+        message: "User not found.",
+      });
+    } else {
+      res.send({
+        success: true,
+        message: "User fetched successfully.",
+        data: {
+          _id: userData?._id,
+          firstName: userData?.firstName,
+          lastName: userData?.lastName,
+          emailId: userData?.emailId,
+          age: userData?.age,
+          gender: userData?.gender,
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
       success: false,
-      message: "User not found.",
+      message: "Something went wrong. Failed to fetch User details.",
     });
-  } else {
-    res.send({
-      success: true,
-      message: "User fetched successfully.",
-      data: {
-        _id: userData?._id,
-        firstName: userData?.firstName,
-        lastName: userData?.lastName,
-        emailId: userData?.emailId,
-        age: userData?.age,
-        gender: userData?.gender,
-      },
+  }
+});
+
+app.delete("/user", async (req, res) => {
+  const userId = req?.query?.id;
+
+  try {
+    const user = await User.findByIdAndDelete(userId);
+
+    if (user) {
+      res.send({
+        success: true,
+        message: "User deleted successfully.",
+      });
+    } else {
+      res.status(400).send({
+        success: false,
+        message: "Failed to delete user. Please try again.",
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Something went wrong. Please try again.",
     });
   }
 });
