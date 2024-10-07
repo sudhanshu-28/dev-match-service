@@ -32,8 +32,8 @@ const userSchema = new mongoose.Schema(
         30,
         "Email Address length should be of maximum 30 characters.",
       ],
-      validate(email) {
-        if (!validator.isEmail(email)) {
+      validate(value) {
+        if (!validator.isEmail(value)) {
           throw new Error("Please enter valid Email Address.");
         }
       },
