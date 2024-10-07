@@ -10,6 +10,8 @@ const app = express();
 // Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
 app.use(express.json());
 
+// NEVER TRUST req.body => It can have malicious data
+
 app.post("/signup", async (req, res) => {
   // Creating new instance of User model
   const user = new User(req?.body);
