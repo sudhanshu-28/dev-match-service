@@ -42,15 +42,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minLength: [8, "Password length should be of minimum 8 characters."],
       validate(value) {
-        if (!containsSpecialChars(value)) {
-          throw new Error(
-            "Password must contain atleast one special characters out of given list " +
-              specialChars
-          );
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a strong password: " + value);
         }
       },
+      // validate(value) {
+      //   if (!containsSpecialChars(value)) {
+      //     throw new Error(
+      //       "Password must contain atleast one special characters out of given list " +
+      //         specialChars
+      //     );
+      //   }
+      // },
     },
     age: {
       type: Number,
