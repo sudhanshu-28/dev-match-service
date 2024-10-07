@@ -121,6 +121,25 @@ app.patch("/user", async (req, res) => {
   const userData = req?.body;
 
   try {
+    const ALLOWED_UPDATES = [
+      "firstName",
+      "lastName",
+      "password",
+      "age",
+      "gender",
+      "photoUrl",
+      "about",
+      "skills",
+    ];
+
+    const isUpdateAllowed = Object.keys(ALLOWED_UPDATES).every((key) =>
+      ALLOWED_UPDATES.includes(key)
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed.");
+    }
+
     const user = await User.findByIdAndUpdate(userId, userData, {
       returnDocument: "after",
       runValidators: true,
@@ -140,7 +159,7 @@ app.patch("/user", async (req, res) => {
     }
   } catch (error) {
     const defaultMsg = "Failed to update User due to Internal Server Error.";
-    res.status(500).send({
+    res.status(400).send({
       success: false,
       message: error?.message ? `Update Failed: ${error?.message}` : defaultMsg,
     });
