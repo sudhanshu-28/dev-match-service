@@ -135,6 +135,7 @@ app.patch("/user/:userId", async (req, res) => {
       "skills",
     ];
 
+    // Data Sanatization in API level
     const isUpdateAllowed = Object.keys(userData).every((key) =>
       ALLOWED_UPDATES.includes(key)
     );
