@@ -17,8 +17,8 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
-    console.log("Error => ", err);
-    res.status(500).send("User failed to add.");
+    console.log("Error => ", error);
+    res.status(400).send(error?.message || error);
   }
 });
 
@@ -123,6 +123,7 @@ app.patch("/user", async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(userId, userData, {
       returnDocument: "after",
+      runValidators: true,
     });
 
     if (user) {
@@ -138,9 +139,10 @@ app.patch("/user", async (req, res) => {
       });
     }
   } catch (error) {
+    const defaultMsg = "Failed to update User due to Internal Server Error.";
     res.status(500).send({
       success: false,
-      message: "Failed to update User due to Internal Server Error.",
+      message: error?.message ? `Update Failed: ${error?.message}` : defaultMsg,
     });
   }
 });
@@ -152,6 +154,7 @@ app.patch("/userUpdateByEmail", async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({ emailId }, userData, {
       returnDocument: "after",
+      runValidators: true,
     });
 
     if (user) {
@@ -167,9 +170,10 @@ app.patch("/userUpdateByEmail", async (req, res) => {
       });
     }
   } catch (error) {
+    const defaultMsg = "Failed to update User due to Internal Server Error.";
     res.status(500).send({
       success: false,
-      message: "Failed to update User due to Internal Server Error.",
+      message: error?.message ? `Update Failed: ${error?.message}` : defaultMsg,
     });
   }
 });
