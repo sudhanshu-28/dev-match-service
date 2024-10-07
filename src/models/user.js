@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
+
 const { specialChars, containsSpecialChars } = require("../utils/helper");
 
 // Create Schema
@@ -30,6 +32,11 @@ const userSchema = new mongoose.Schema(
         30,
         "Email Address length should be of maximum 30 characters.",
       ],
+      validate(email) {
+        if (!validator.isEmail(email)) {
+          throw new Error("Please enter valid Email Address.");
+        }
+      },
     },
     password: {
       type: String,
