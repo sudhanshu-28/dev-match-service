@@ -84,6 +84,7 @@ app.get("/getUserById", async (req, res) => {
 });
 
 app.get("/getUserByEmail", async (req, res) => {
+  // Passing key and value after API name with ? are the queries
   const userEmailID = req?.query?.emailID;
 
   try {
@@ -116,8 +117,10 @@ app.get("/getUserByEmail", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
-  const userId = req?.query?.id;
+app.patch("/user/:userId", async (req, res) => {
+  // Passing id/value directly in URL after API name are the parameters
+  const userId = req?.params?.userId;
+
   const userData = req?.body;
 
   try {
@@ -132,7 +135,7 @@ app.patch("/user", async (req, res) => {
       "skills",
     ];
 
-    const isUpdateAllowed = Object.keys(ALLOWED_UPDATES).every((key) =>
+    const isUpdateAllowed = Object.keys(userData).every((key) =>
       ALLOWED_UPDATES.includes(key)
     );
 
