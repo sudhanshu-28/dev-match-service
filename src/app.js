@@ -121,7 +121,7 @@ app.patch("/user/:userId", async (req, res) => {
   // Passing id/value directly in URL after API name are the parameters
   const userId = req?.params?.userId;
 
-  const userData = req?.body;
+  let userData = req?.body;
 
   try {
     const ALLOWED_UPDATES = [
@@ -142,6 +142,15 @@ app.patch("/user/:userId", async (req, res) => {
 
     if (!isUpdateAllowed) {
       throw new Error("Update not allowed.");
+    }
+
+    // Never trust user data and prevent external attack and do proper Data Sanatization
+    if (userData?.skills) {
+      if (userData?.skills.length > 10) {
+        throw new Error("Skills cannot be more than 10.");
+      } else {
+        userData.skills = [...new Set(userData?.skills)];
+      }
     }
 
     const user = await User.findByIdAndUpdate(userId, userData, {
