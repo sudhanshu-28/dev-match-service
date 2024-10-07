@@ -1,4 +1,6 @@
 const express = require("express");
+const validator = require("validator");
+
 const connectDB = require("./config/database");
 const User = require("./models/user");
 
@@ -14,6 +16,13 @@ app.post("/signup", async (req, res) => {
 
   // Recommend way - with All DB operations best practice is to write in try catch
   try {
+    if (user?.emailId) {
+      const isValidEmail = validator.isEmail(user?.emailId);
+      if (!isValidEmail) {
+        throw new Error("Error: Invalid Email Address.");
+      }
+    }
+
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
