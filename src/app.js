@@ -103,7 +103,6 @@ app.get("/profile", async (req, res) => {
     }
 
     const user = await User.findById(_id);
-    console.log(user);
 
     if (!user) {
       throw new Error("Authentication failed. User details not found.");
