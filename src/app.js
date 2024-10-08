@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 
-const { validateSignUpData } = require("./utils");
+const { validateSignUpData, validateSignInData } = require("./utils");
 
 const app = express();
 
@@ -38,6 +38,49 @@ app.post("/signup", async (req, res) => {
     res.send("User added successfully!");
   } catch (error) {
     res.status(400).send(`Error: ${error?.message || error}`);
+  }
+});
+
+app.post("/signin", async (req, res) => {
+  try {
+    validateSignInData(req);
+
+    const { emailId, password } = req?.body;
+
+    const user = await User.findOne({ emailId });
+
+    if (user) {
+      const { password: passwordHash } = user;
+
+      if (user?.password) {
+        const match = await bcrypt.compare(password, passwordHash);
+
+        if (match) {
+          res.send({
+            success: true,
+            message: "Logged in successfully!",
+            data: {
+              _id: user?._id,
+              firstName: user?.firstName,
+              lastName: user?.lastName,
+              emailId: user?.emailId,
+              photoUrl: user?.photoUrl,
+              about: user?.about,
+              skills: user?.skills,
+            },
+          });
+        } else {
+          throw new Error("Email or password is incorrect.");
+        }
+      }
+    } else {
+      throw new Error("Email or password is incorrect.");
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: `Error: ${error?.message || error}`,
+    });
   }
 });
 

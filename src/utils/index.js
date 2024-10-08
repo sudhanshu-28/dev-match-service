@@ -1,8 +1,9 @@
-const { validateSignUpData } = require("./validation");
+const { validateSignUpData, validateSignInData } = require("./validation");
 const { specialChars, containsSpecialChars } = require("./specialCharsCheck");
 
 module.exports = {
   specialChars,
-  validateSignUpData,
   containsSpecialChars,
+  validateSignInData,
+  validateSignUpData,
 };
