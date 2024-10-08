@@ -67,7 +67,9 @@ app.post("/login", async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, passwordHash);
 
         if (isPasswordValid) {
-          const token = await jwt.sign({ _id }, "DEVTinder@997");
+          const token = await jwt.sign({ _id }, "DEVTinder@997", {
+            expiresIn: "1d",
+          });
           res.cookie("token", token);
 
           res.send({
