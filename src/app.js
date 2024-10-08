@@ -71,7 +71,7 @@ app.post("/login", async (req, res) => {
             expiresIn: "1d",
           });
           res.cookie("token", token, {
-            maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+            expires: 24 * 60 * 60 * 1000, // 1 day in milliseconds
           });
 
           res.send({
