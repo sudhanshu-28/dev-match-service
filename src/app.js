@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
 const User = require("./models/user");
@@ -11,9 +12,10 @@ const app = express();
 
 // NEVER TRUST req.body => It can have malicious data
 
-// Convert JSON (Readable Stream) into Javascript Object - for all the APIs request for all HTTP methods (use)
+// Convert JSON (Readable Stream) into Javascript Object for all the APIs request for all HTTP methods
 // Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
 app.use(express.json());
+app.use(cookieParser());
 
 // Entry point of our application - to register new user
 app.post("/signup", async (req, res) => {
@@ -82,6 +84,42 @@ app.post("/login", async (req, res) => {
     res.status(400).send({
       success: false,
       message: `Error: ${error?.message || error}`,
+    });
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const { token } = req?.cookies;
+
+    if (!token) {
+      throw new Error("Authentication failed. Please log in again.");
+    }
+
+    const { _id } = jwt.verify(token, "DEVTinder@997");
+
+    if (!_id) {
+      throw new Error("Authentication failed. User not found.");
+    }
+
+    const user = await User.findById(_id);
+    console.log(user);
+
+    if (!user) {
+      throw new Error("Authentication failed. User details not found.");
+    }
+
+    const { firstName, lastName, emailId, photoUrl, about, skills } = user;
+
+    res.send({
+      success: true,
+      message: "Profile fetched successfully.",
+      data: { firstName, lastName, emailId, photoUrl, about, skills },
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: "Error: " + error?.message,
     });
   }
 });
