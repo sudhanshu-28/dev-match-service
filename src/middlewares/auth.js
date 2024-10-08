@@ -21,6 +21,7 @@ const userAuth = async (req, res, next) => {
       throw new Error("Authentication failed. User details not found.");
     }
 
+    req.user = user; // Attach user details to req body, if any authenticated API required access to it
     next();
   } catch (error) {
     res.status(401).send({

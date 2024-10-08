@@ -91,12 +91,12 @@ app.post("/login", async (req, res) => {
 
 app.get("/profile", userAuth, async (req, res) => {
   try {
-    // Because we have already authenticated token with userAuth middleware hence not validation in below code
-    const { token } = req?.cookies;
-    const { _id } = await jwt.verify(token, "DEVTinder@997");
+    // Fetched User details from userAuth middleware
+    if (!req?.user) {
+      throw new Error("Authentication failed. User details not found.");
+    }
 
-    const user = await User.findById(_id);
-    const { firstName, lastName, emailId, photoUrl, about, skills } = user;
+    const { firstName, lastName, emailId, photoUrl, about, skills } = req?.user;
 
     res.send({
       success: true,
