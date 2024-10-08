@@ -89,26 +89,13 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
+    // Because we have already authenticated token with userAuth middleware hence not validation in below code
     const { token } = req?.cookies;
-
-    if (!token) {
-      throw new Error("Authentication failed. Please log in again.");
-    }
-
     const { _id } = await jwt.verify(token, "DEVTinder@997");
 
-    if (!_id) {
-      throw new Error("Authentication failed. User not found.");
-    }
-
     const user = await User.findById(_id);
-
-    if (!user) {
-      throw new Error("Authentication failed. User details not found.");
-    }
-
     const { firstName, lastName, emailId, photoUrl, about, skills } = user;
 
     res.send({
@@ -124,7 +111,7 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-app.get("/getAllUsers", async (req, res) => {
+app.get("/getAllUsers", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     const count = await User.countDocuments();
@@ -159,7 +146,7 @@ app.get("/getAllUsers", async (req, res) => {
   }
 });
 
-app.get("/getUserById", async (req, res) => {
+app.get("/getUserById", userAuth, async (req, res) => {
   const userId = req?.query?.id;
 
   const userData = await User.findById(userId).exec();
@@ -185,7 +172,7 @@ app.get("/getUserById", async (req, res) => {
   }
 });
 
-app.get("/getUserByEmail", async (req, res) => {
+app.get("/getUserByEmail", userAuth, async (req, res) => {
   // Passing key and value after API name with ? are the queries
   const userEmailID = req?.query?.emailID;
 
@@ -219,7 +206,7 @@ app.get("/getUserByEmail", async (req, res) => {
   }
 });
 
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", userAuth, async (req, res) => {
   // Passing id/value directly in URL after API name are the parameters
   const userId = req?.params?.userId;
 
@@ -281,7 +268,7 @@ app.patch("/user/:userId", async (req, res) => {
   }
 });
 
-app.patch("/userUpdateByEmail", async (req, res) => {
+app.patch("/userUpdateByEmail", userAuth, async (req, res) => {
   const { emailId } = req?.query;
   const userData = req?.body;
 
@@ -312,7 +299,7 @@ app.patch("/userUpdateByEmail", async (req, res) => {
   }
 });
 
-app.delete("/user", async (req, res) => {
+app.delete("/user", userAuth, async (req, res) => {
   const userId = req?.query?.id;
 
   try {
