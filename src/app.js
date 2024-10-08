@@ -111,6 +111,20 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      message: "Connection Request Sent.",
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: "Error: " + error,
+    });
+  }
+});
+
 app.get("/getAllUsers", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
