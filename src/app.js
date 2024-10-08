@@ -1,35 +1,43 @@
 const express = require("express");
-const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 const connectDB = require("./config/database");
 const User = require("./models/user");
 
+const { validateSignUpData } = require("./utils");
+
 const app = express();
+
+// NEVER TRUST req.body => It can have malicious data
 
 // Convert JSON (Readable Stream) into Javascript Object - for all the APIs request for all HTTP methods (use)
 // Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
 app.use(express.json());
 
-// NEVER TRUST req.body => It can have malicious data
-
+// Entry point of our application - to register new user
 app.post("/signup", async (req, res) => {
-  // Creating new instance of User model
-  const user = new User(req?.body);
-
-  // Recommend way - with All DB operations best practice is to write in try catch
+  // Recommend way - with All DB operations best practice is to write in try catch block
   try {
-    if (user?.emailId) {
-      const isValidEmail = validator.isEmail(user?.emailId);
-      if (!isValidEmail) {
-        throw new Error("Error: Invalid Email Address.");
-      }
-    }
+    // Step 1: Validation of Data
+    validateSignUpData(req);
+
+    const { firstName, lastName, emailId, password } = req?.body;
+
+    // Step 2: Encrypt the password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Creating new instance of User model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
 
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
-    console.log("Error => ", error);
-    res.status(400).send(error?.message || error);
+    res.status(400).send(`Error: ${error?.message || error}`);
   }
 });
 
