@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // Create Schema
 const userSchema = new mongoose.Schema(
@@ -96,7 +98,31 @@ const userSchema = new mongoose.Schema(
   { timestamps: true } // Default store with UTC
 );
 
-// Create Modal
-const User = mongoose.model("User", userSchema);
+// Schema Methods make your function/method easily reusable:
+// Always we need to use Normal function here, because for each user record we create instance and for this is attached to userObj
+// And this does not work with arrow function
+userSchema.methods.getJWT = async function () {
+  const user = this;
 
-module.exports = User;
+  const token = await jwt.sign({ _id: user?._id }, "DEVTinder@997", {
+    expiresIn: "1d",
+  });
+
+  return token;
+};
+
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+  const hashedPassword = user?.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    hashedPassword
+  );
+
+  return isPasswordValid;
+};
+
+// Create Modal
+// const User = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);

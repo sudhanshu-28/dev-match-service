@@ -1,6 +1,5 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
@@ -64,12 +63,11 @@ app.post("/login", async (req, res) => {
       const { _id, password: passwordHash } = user;
 
       if (user?.password) {
-        const isPasswordValid = await bcrypt.compare(password, passwordHash);
+        const isPasswordValid = await user.validatePassword(password);
 
         if (isPasswordValid) {
-          const token = await jwt.sign({ _id }, "DEVTinder@997", {
-            expiresIn: "1d",
-          });
+          // Create JWT Token
+          const token = await user.getJWT(); // Offloaded JWT Logic to Schema methods
 
           // maxAge takes value in milliseconds
           // expires takes value in specific date
