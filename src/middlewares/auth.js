@@ -9,7 +9,7 @@ const userAuth = async (req, res, next) => {
       throw new Error("Authentication failed. Please log in again.");
     }
 
-    const { _id } = jwt.verify(token, "DEVTinder@997");
+    const { _id } = await jwt.verify(token, "DEVTinder@997");
 
     if (!_id) {
       throw new Error("Authentication failed. User not found.");

@@ -67,7 +67,7 @@ app.post("/login", async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, passwordHash);
 
         if (isPasswordValid) {
-          const token = jwt.sign({ _id }, "DEVTinder@997");
+          const token = await jwt.sign({ _id }, "DEVTinder@997");
           res.cookie("token", token);
 
           res.send({
@@ -97,7 +97,7 @@ app.get("/profile", async (req, res) => {
       throw new Error("Authentication failed. Please log in again.");
     }
 
-    const { _id } = jwt.verify(token, "DEVTinder@997");
+    const { _id } = await jwt.verify(token, "DEVTinder@997");
 
     if (!_id) {
       throw new Error("Authentication failed. User not found.");
