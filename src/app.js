@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const connectDB = require("./config/database");
 const User = require("./models/user");
@@ -57,24 +58,18 @@ app.post("/login", async (req, res) => {
     const user = await User.findOne({ emailId });
 
     if (user) {
-      const { password: passwordHash } = user;
+      const { _id, password: passwordHash } = user;
 
       if (user?.password) {
         const isPasswordValid = await bcrypt.compare(password, passwordHash);
 
         if (isPasswordValid) {
+          const token = jwt.sign({ _id }, "DEVTinder@997");
+          res.cookie("token", token);
+
           res.send({
             success: true,
             message: "Logged In successfully!",
-            data: {
-              _id: user?._id,
-              firstName: user?.firstName,
-              lastName: user?.lastName,
-              emailId: user?.emailId,
-              photoUrl: user?.photoUrl,
-              about: user?.about,
-              skills: user?.skills,
-            },
           });
         } else {
           throw new Error("Invalid credentials.");
