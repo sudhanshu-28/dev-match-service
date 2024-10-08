@@ -113,9 +113,11 @@ app.get("/profile", userAuth, async (req, res) => {
 
 app.post("/sendConnectionRequest", userAuth, async (req, res) => {
   try {
+    const { firstName } = req?.user;
+
     res.send({
       success: true,
-      message: "Connection Request Sent.",
+      message: firstName + " has sent Connection Request.",
     });
   } catch (error) {
     res.status(400).send({
