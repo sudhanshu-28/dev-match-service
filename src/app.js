@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 
+const { userAuth } = require("./middlewares/auth");
 const { validateSignUpData, validateSignInData } = require("./utils");
 
 const app = express();
@@ -336,7 +337,7 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     const count = await User.countDocuments();
