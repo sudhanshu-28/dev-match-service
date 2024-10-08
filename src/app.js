@@ -70,8 +70,13 @@ app.post("/login", async (req, res) => {
           const token = await jwt.sign({ _id }, "DEVTinder@997", {
             expiresIn: "1d",
           });
+
+          // maxAge takes value in milliseconds
+          // expires takes value in specific date
+
           res.cookie("token", token, {
-            expires: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+            maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
           });
 
           res.send({
