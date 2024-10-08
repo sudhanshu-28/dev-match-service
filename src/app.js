@@ -41,7 +41,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.post("/signin", async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     validateSignInData(req);
 
@@ -53,12 +53,12 @@ app.post("/signin", async (req, res) => {
       const { password: passwordHash } = user;
 
       if (user?.password) {
-        const match = await bcrypt.compare(password, passwordHash);
+        const isPasswordValid = await bcrypt.compare(password, passwordHash);
 
-        if (match) {
+        if (isPasswordValid) {
           res.send({
             success: true,
-            message: "Logged in successfully!",
+            message: "Logged In successfully!",
             data: {
               _id: user?._id,
               firstName: user?.firstName,
@@ -70,11 +70,11 @@ app.post("/signin", async (req, res) => {
             },
           });
         } else {
-          throw new Error("Email or password is incorrect.");
+          throw new Error("Invalid credentials.");
         }
       }
     } else {
-      throw new Error("Email or password is incorrect.");
+      throw new Error("Invalid credentials.");
     }
   } catch (error) {
     res.status(400).send({
