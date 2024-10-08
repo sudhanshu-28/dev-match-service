@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const { specialChars, containsSpecialChars } = require("../utils/helper");
-
 // Create Schema
 const userSchema = new mongoose.Schema(
   {
