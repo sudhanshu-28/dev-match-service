@@ -29,42 +29,33 @@ profileRouter.get("/view", userAuth, async (req, res) => {
   }
 });
 
-profileRouter.patch("/edit/:userId", userAuth, async (req, res) => {
+profileRouter.patch("/edit", userAuth, async (req, res) => {
   try {
-    const { userId } = req?.params;
+    const loggedInUser = req?.user;
 
-    console.log("req?.user?.firstName => ", req?.user?.firstName);
-
-    if (!userId && !req?.user) {
+    if (!loggedInUser) {
       throw new Error("Authentication failed. User details not found.");
-    }
-
-    if (userId !== req?.user?._id.toString()) {
-      throw new Error(
-        "User details cannot be updated while logged in as a different user. Please log in with the correct user ID to make changes."
-      );
     }
 
     validateProfileEditData(req);
 
     const userData = req?.body;
 
-    const user = await User.findByIdAndUpdate(userId, userData, {
-      runValidators: true,
-      returnDocument: "after",
-    });
+    Object.keys(userData).forEach((key) => (loggedInUser[key] = userData[key]));
+
+    await loggedInUser.save();
 
     res.send({
       success: true,
       message: "User updated successfully.",
       data: {
-        _id: user?._id,
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        emailId: user?.emailId,
-        photoUrl: user?.photoUrl,
-        about: user?.about,
-        skills: user?.skills,
+        _id: loggedInUser?._id,
+        firstName: loggedInUser?.firstName,
+        lastName: loggedInUser?.lastName,
+        emailId: loggedInUser?.emailId,
+        photoUrl: loggedInUser?.photoUrl,
+        about: loggedInUser?.about,
+        skills: loggedInUser?.skills,
       },
     });
   } catch (error) {
