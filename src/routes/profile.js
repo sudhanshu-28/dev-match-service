@@ -1,9 +1,13 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
 
+const {
+  validateProfileEditData,
+  validateProfilePasswordData,
+} = require("../utils/validation");
 const { userAuth } = require("../middlewares/auth");
-const { validateProfileEditData } = require("../utils/validation");
 
 const profileRouter = express.Router();
 
@@ -57,6 +61,45 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
         about: loggedInUser?.about,
         skills: loggedInUser?.skills,
       },
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: "Error: " + error?.message,
+    });
+  }
+});
+
+profileRouter.patch("/password", userAuth, async (req, res) => {
+  try {
+    const userData = req?.user;
+
+    if (!userData) {
+      throw new Error("Authentication failed. User details not found.");
+    }
+
+    validateProfilePasswordData(req);
+
+    const { currentPassword, confirmPassword } = req?.body;
+
+    const isMatched = await bcrypt.compare(currentPassword, userData?.password);
+
+    if (!isMatched) {
+      throw new Error("Current Password entered does not match.");
+    }
+
+    const passwordHash = await bcrypt.hash(confirmPassword, 10);
+    const user = await User.findByIdAndUpdate(userData?._id, {
+      password: passwordHash,
+    });
+
+    if (!user) {
+      throw new Error("Password update failed.");
+    }
+
+    res.send({
+      success: true,
+      message: "Password updated successfully.",
     });
   } catch (error) {
     res.status(400).send({

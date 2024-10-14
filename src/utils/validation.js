@@ -51,8 +51,21 @@ const validateProfileEditData = (req) => {
   }
 };
 
+const validateProfilePasswordData = (req) => {
+  const { currentPassword, newPassword, confirmPassword } = req?.body;
+
+  if (!validator.isStrongPassword(newPassword)) {
+    throw new Error("Please choose a strong new Password.");
+  } else if (currentPassword === newPassword) {
+    throw new Error("Old & New password cannot be same.");
+  } else if (newPassword !== confirmPassword) {
+    throw new Error("New & Confirmed password does not match.");
+  }
+};
+
 module.exports = {
   validateSignUpData,
   validateSignInData,
   validateProfileEditData,
+  validateProfilePasswordData,
 };
