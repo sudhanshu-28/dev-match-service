@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const validator = require("validator");
 
 const validateSignUpData = (req) => {
@@ -63,9 +64,27 @@ const validateProfilePasswordData = (req) => {
   }
 };
 
+const validateNonMatchingUserIds = (firstId, secondId) => {
+  if (firstId.toString() === secondId.toString()) {
+    throw new Error(
+      "You cannot send a request to the same user you are currently logged in as."
+    );
+  }
+};
+
+const validateObjectId = (objId) => {
+  if (!mongoose.isValidObjectId(objId)) {
+    throw new Error(
+      "Invalid User Id. Could not able to sent connection request."
+    );
+  }
+};
+
 module.exports = {
   validateSignUpData,
   validateSignInData,
   validateProfileEditData,
   validateProfilePasswordData,
+  validateNonMatchingUserIds,
+  validateObjectId,
 };

@@ -4,34 +4,29 @@ const User = require("../models/user");
 const ConnectionRequest = require("../models/connectionRequest");
 
 const { userAuth } = require("../middlewares/auth");
-const { default: mongoose } = require("mongoose");
+const {
+  validateNonMatchingUserIds,
+  validateObjectId,
+} = require("../utils/validation");
 
 const requestRouter = express.Router();
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
-    const { _id: fromUserId, firstName: fromUserName } = req?.user;
     const { status, toUserId } = req?.params;
+    const { _id: fromUserId, firstName: fromUserName } = req?.user;
 
     // Handled in pre check of Schema
-    if (fromUserId.toString() === toUserId.toString()) {
-      throw new Error(
-        "You cannot send a request to the same user you are currently logged in as."
-      );
-    }
+    validateNonMatchingUserIds(fromUserId, toUserId);
+
+    // Validate request ID
+    validateObjectId(toUserId);
 
     const ALLOWED_STATUS = ["ignore", "interested"];
 
     // Validation of IDs are also done at Schema level with pre function
     if (!status || !ALLOWED_STATUS.includes(status)) {
       throw new Error(`Invalid status type: ${status}`);
-    }
-
-    // Validate request ID
-    if (!mongoose.isValidObjectId(toUserId)) {
-      throw new Error(
-        "Invalid User Id. Could not able to sent connection request."
-      );
     }
 
     // Check user exist with this ID or not
@@ -72,6 +67,51 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       success: true,
       message,
       data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error: " + error,
+    });
+  }
+});
+
+requestRouter.post("/review/:status/:requestId", userAuth, async (req, res) => {
+  try {
+    const { _id } = req?.user;
+    const { status, requestId } = req?.params;
+
+    // Handled in pre check of Schema
+    validateNonMatchingUserIds(requestId, _id);
+
+    // Validate request ID
+    validateObjectId(requestId);
+
+    const ALLOWED_STATUS = ["accepted", "rejected"];
+
+    // Validation of IDs are also done at Schema level with pre function
+    if (!status || !ALLOWED_STATUS.includes(status)) {
+      throw new Error(`Invalid status type: ${status}`);
+    }
+
+    const connectionRequestUpdateData =
+      await ConnectionRequest.findOneAndUpdate(
+        {
+          fromUserId: requestId,
+          toUserId: _id,
+          status: "interested",
+        },
+        { status }
+      );
+
+    if (!connectionRequestUpdateData) {
+      throw new Error("Failed to accept / reject connection request.");
+    }
+
+    res.json({
+      success: true,
+      message: "Connection request " + status + " successfully.",
+      data: connectionRequestUpdateData,
     });
   } catch (error) {
     res.status(400).json({
