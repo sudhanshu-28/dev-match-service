@@ -24,6 +24,7 @@ const connectionRequestSchema = new mongoose.Schema(
 
 // Pre function is applied at schema level, so any time save method is called, this pre function will execute before
 connectionRequestSchema.pre("save", function (next) {
+  // Every time mongoose save the new record in this schema/collection this function will be executed
   const connectionRequest = this;
 
   // Check if fromUserId is same as toUserId

@@ -22,7 +22,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     const ALLOWED_STATUS = ["ignore", "interested"];
 
-    // Valudate status
+    // Validation of IDs are also done at Schema level with pre function
     if (!status || !ALLOWED_STATUS.includes(status)) {
       throw new Error(`Invalid status type: ${status}`);
     }
