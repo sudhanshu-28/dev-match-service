@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
+      index: true,
       required: [true, "Please enter First Name."], // by default if not passed it will be false
       trim: true,
       minLength: [3, "First Name length should be of minimum 3 characters."],
@@ -22,7 +23,8 @@ const userSchema = new mongoose.Schema(
     emailId: {
       type: String,
       required: [true, "Please enter Email address"],
-      unique: true,
+      unique: true, // Unique index. If you specify `unique: true`
+      // specifying `index: true` is optional if you do `unique: true`
       lowercase: true,
       trim: true,
       minLength: 5,

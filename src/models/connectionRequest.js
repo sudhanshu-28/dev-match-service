@@ -22,6 +22,11 @@ const connectionRequestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Because we are checking connection request if exist from 2 fileds, so indexing only one field will not work
+// We will need to create COMPOUND INDEX as shown below
+// Now below combined query will work very fast
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
+
 // Pre function is applied at schema level, so any time save method is called, this pre function will execute before
 connectionRequestSchema.pre("save", function (next) {
   // Every time mongoose save the new record in this schema/collection this function will be executed

@@ -46,7 +46,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       $or: [
         { fromUserId, toUserId },
         { fromUserId: toUserId, toUserId: fromUserId },
-      ],
+      ], // We have Compund Index for this both field to search in DB very fast
     });
 
     if (existingConnectionRequest) {
