@@ -13,10 +13,16 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const { _id: fromUserId } = req?.user;
     const { status, toUserId } = req?.params;
 
-    console.log(typeof status);
+    if (fromUserId.toString() === toUserId.toString()) {
+      throw new Error(
+        "You cannot send a request to the same user you are currently logged in as."
+      );
+    }
+
+    const ALLOWED_STATUS = ["ignore", "interested"];
 
     // Valudate status
-    if (!status || !(status === "ignore" || status === "interested")) {
+    if (!status || !ALLOWED_STATUS.includes(status)) {
       throw new Error("Connection request Status is invalid.");
     }
 
