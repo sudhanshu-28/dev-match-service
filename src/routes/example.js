@@ -20,20 +20,20 @@ exampleRouter.get("/getAllUsers", userAuth, async (req, res) => {
     }));
 
     if (usersList.length === 0) {
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         message: "Users not found.",
       });
     }
 
-    res.send({
+    res.json({
       success: true,
       message: "Users list fetched successfully.",
       data: usersList,
       totalUsers: count,
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Something went wrong. Failed to fetch Users list.",
     });
@@ -46,12 +46,12 @@ exampleRouter.get("/getUserById", userAuth, async (req, res) => {
   const userData = await User.findById(userId).exec();
 
   if (!userData) {
-    res.status(404).send({
+    res.status(404).json({
       status: false,
       message: "User not found.",
     });
   } else {
-    res.send({
+    res.json({
       success: true,
       message: "User fetched successfully.",
       data: {
@@ -74,12 +74,12 @@ exampleRouter.get("/getUserByEmail", userAuth, async (req, res) => {
     const userData = await User.findOne({ emailId: userEmailID });
 
     if (!userData) {
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         message: "User not found.",
       });
     } else {
-      res.send({
+      res.json({
         success: true,
         message: "User fetched successfully.",
         data: {
@@ -93,7 +93,7 @@ exampleRouter.get("/getUserByEmail", userAuth, async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).send({
+    res.status(500).json({
       success: false,
       message: "Something went wrong. Failed to fetch User details.",
     });
@@ -142,20 +142,20 @@ exampleRouter.patch("/user/:userId", userAuth, async (req, res) => {
     });
 
     if (user) {
-      res.send({
+      res.json({
         success: true,
         message: "User data updated successfully.",
         data: user,
       });
     } else {
-      res.status(400).send({
+      res.status(400).json({
         success: false,
         message: "Something went wrong, failed to update User.",
       });
     }
   } catch (error) {
     const defaultMsg = "Failed to update User due to Internal Server Error.";
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: error?.message ? `Update Failed: ${error?.message}` : defaultMsg,
     });
@@ -173,20 +173,20 @@ exampleRouter.patch("/userUpdateByEmail", userAuth, async (req, res) => {
     });
 
     if (user) {
-      res.send({
+      res.json({
         success: true,
         message: "User data updated successfully.",
         data: user,
       });
     } else {
-      res.status(400).send({
+      res.status(400).json({
         success: false,
         message: "Something went wrong, failed to update User.",
       });
     }
   } catch (error) {
     const defaultMsg = "Failed to update User due to Internal Server Error.";
-    res.status(500).send({
+    res.status(500).json({
       success: false,
       message: error?.message ? `Update Failed: ${error?.message}` : defaultMsg,
     });
@@ -200,18 +200,18 @@ exampleRouter.delete("/user", userAuth, async (req, res) => {
     const user = await User.findByIdAndDelete(userId);
 
     if (user) {
-      res.send({
+      res.json({
         success: true,
         message: "User deleted successfully.",
       });
     } else {
-      res.status(400).send({
+      res.status(400).json({
         success: false,
         message: "Failed to delete user. Please try again.",
       });
     }
   } catch (error) {
-    res.status(500).send({
+    res.status(500).json({
       success: false,
       message: "Something went wrong. Please try again.",
     });

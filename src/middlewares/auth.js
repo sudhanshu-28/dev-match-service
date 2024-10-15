@@ -24,7 +24,7 @@ const userAuth = async (req, res, next) => {
     req.user = user; // Attach user details to req body, if any authenticated API required access to it
     next();
   } catch (error) {
-    res.status(401).send({
+    res.status(401).json({
       success: false,
       message: "Error: " + error,
     });
@@ -37,7 +37,7 @@ const adminAuth = (req, res, next) => {
   const isAdminAuthorized = token === "xyz";
 
   if (!isAdminAuthorized) {
-    res.status(401).send("Unauthorized User");
+    res.status(401).json("Unauthorized User");
   } else {
     next();
   }

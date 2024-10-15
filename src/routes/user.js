@@ -20,20 +20,20 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     }));
 
     if (usersList.length === 0) {
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         message: "Users not found.",
       });
     }
 
-    res.send({
+    res.json({
       success: true,
       message: "Users list fetched successfully.",
       data: usersList,
       totalUsers: count,
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Something went wrong. Failed to fetch Users list.",
     });

@@ -28,12 +28,12 @@ authRouter.post("/signup", async (req, res) => {
 
     await user.save();
 
-    res.send({
+    res.json({
       success: true,
       message: "User added successfully!",
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: `Error: ${error?.message || error}`,
     });
@@ -66,7 +66,7 @@ authRouter.post("/login", async (req, res) => {
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
           });
 
-          res.send({
+          res.json({
             success: true,
             message: "Logged In successfully!",
           });
@@ -78,7 +78,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Invalid credentials.");
     }
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: `Error: ${error?.message || error}`,
     });
@@ -86,7 +86,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.get("/logout", (req, res) => {
-  res.clearCookie("token").send({
+  res.clearCookie("token").json({
     success: true,
     message: "Logout successfully!",
   }); // Chaining

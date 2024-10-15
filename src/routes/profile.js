@@ -20,13 +20,13 @@ profileRouter.get("/view", userAuth, async (req, res) => {
 
     const { firstName, lastName, emailId, photoUrl, about, skills } = req?.user;
 
-    res.send({
+    res.json({
       success: true,
       message: "Profile fetched successfully.",
       data: { firstName, lastName, emailId, photoUrl, about, skills },
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Error: " + error?.message,
     });
@@ -49,7 +49,7 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
 
     await loggedInUser.save();
 
-    res.send({
+    res.json({
       success: true,
       message: "User updated successfully.",
       data: {
@@ -63,7 +63,7 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Error: " + error?.message,
     });
@@ -97,12 +97,12 @@ profileRouter.patch("/password", userAuth, async (req, res) => {
       throw new Error("Password update failed.");
     }
 
-    res.send({
+    res.json({
       success: true,
       message: "Password updated successfully.",
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Error: " + error?.message,
     });

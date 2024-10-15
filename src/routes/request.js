@@ -49,7 +49,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     const data = await newConnectionRequest.save();
 
-    res.send({
+    res.json({
       success: true,
       message:
         "Connection Request has been sent to " +
@@ -58,7 +58,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       data,
     });
   } catch (error) {
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Error: " + error,
     });
