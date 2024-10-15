@@ -23,7 +23,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     // Valudate status
     if (!status || !ALLOWED_STATUS.includes(status)) {
-      throw new Error("Connection request Status is invalid.");
+      throw new Error(`Invalid status type: ${status}`);
     }
 
     // Validate request ID
@@ -38,6 +38,18 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     if (!user) {
       throw new Error("User not found.");
+    }
+
+    // Check for existingConnectionRequest
+    const existingConnectionRequest = ConnectionRequest.findOne({
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId },
+      ],
+    });
+
+    if (existingConnectionRequest) {
+      throw new Error("Connection Request already present.");
     }
 
     // Store Connection request
