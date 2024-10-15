@@ -10,7 +10,7 @@ const requestRouter = express.Router();
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
-    const { _id: fromUserId } = req?.user;
+    const { _id: fromUserId, firstName: fromUserName } = req?.user;
     const { status, toUserId } = req?.params;
 
     // Handled in pre check of Schema
@@ -35,9 +35,9 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     }
 
     // Check user exist with this ID or not
-    const user = await User.findById(toUserId);
+    const { _id, firstName: toUserName } = await User.findById(toUserId);
 
-    if (!user) {
+    if (!_id) {
       throw new Error("User not found.");
     }
 
@@ -62,12 +62,15 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     const data = await newConnectionRequest.save();
 
+    let message = `${fromUserName} is ${status} in ${toUserName}`;
+
+    if (status === "ignore") {
+      message = `${fromUserName} ${status} ${toUserName} connection request.`;
+    }
+
     res.json({
       success: true,
-      message:
-        "Connection Request has been sent to " +
-        user?.firstName +
-        " successfully.",
+      message,
       data,
     });
   } catch (error) {
