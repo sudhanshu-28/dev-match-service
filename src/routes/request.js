@@ -8,10 +8,17 @@ const { default: mongoose } = require("mongoose");
 
 const requestRouter = express.Router();
 
-requestRouter.post("/send/interested/:userId", userAuth, async (req, res) => {
+requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
     const { _id: fromUserId } = req?.user;
-    const { userId: toUserId } = req?.params;
+    const { status, toUserId } = req?.params;
+
+    console.log(typeof status);
+
+    // Valudate status
+    if (!status || !(status === "ignore" || status === "interested")) {
+      throw new Error("Connection request Status is invalid.");
+    }
 
     // Validate request ID
     if (!mongoose.isValidObjectId(toUserId)) {
@@ -31,10 +38,10 @@ requestRouter.post("/send/interested/:userId", userAuth, async (req, res) => {
     const newConnectionRequest = new ConnectionRequest({
       fromUserId,
       toUserId,
-      status: "interested",
+      status,
     });
 
-    await newConnectionRequest.save();
+    const data = await newConnectionRequest.save();
 
     res.send({
       success: true,
@@ -42,6 +49,7 @@ requestRouter.post("/send/interested/:userId", userAuth, async (req, res) => {
         "Connection Request has been sent to " +
         user?.firstName +
         " successfully.",
+      data,
     });
   } catch (error) {
     res.status(400).send({
