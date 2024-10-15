@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ConnectionRequest = new mongoose.Schema(
+const connectionRequestSchema = new mongoose.Schema(
   {
     fromUserId: {
       type: mongoose.Types.ObjectId,
@@ -22,4 +22,21 @@ const ConnectionRequest = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = new mongoose.model("connectionRequest", ConnectionRequest);
+// Pre function is applied at schema level, so any time save method is called, this pre function will execute before
+connectionRequestSchema.pre("save", function (next) {
+  const connectionRequest = this;
+
+  // Check if fromUserId is same as toUserId
+  if (connectionRequest?.fromUserId.equals(connectionRequest?.toUserId)) {
+    throw new Error(
+      "You cannot send a request to the same user you are currently logged in as."
+    );
+  }
+
+  next();
+});
+
+module.exports = new mongoose.model(
+  "connectionRequest",
+  connectionRequestSchema
+);

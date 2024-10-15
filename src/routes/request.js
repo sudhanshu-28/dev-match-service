@@ -13,6 +13,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const { _id: fromUserId } = req?.user;
     const { status, toUserId } = req?.params;
 
+    // Handled in pre check of Schema
     if (fromUserId.toString() === toUserId.toString()) {
       throw new Error(
         "You cannot send a request to the same user you are currently logged in as."
