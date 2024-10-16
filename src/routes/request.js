@@ -81,9 +81,6 @@ requestRouter.post("/review/:status/:requestId", userAuth, async (req, res) => {
     const { _id } = req?.user;
     const { status, requestId } = req?.params;
 
-    // Handled in pre check of Schema
-    validateNonMatchingUserIds(requestId, _id);
-
     // Validate request ID
     validateObjectId(requestId);
 
@@ -96,7 +93,7 @@ requestRouter.post("/review/:status/:requestId", userAuth, async (req, res) => {
 
     const connectionRequest = await ConnectionRequest.findOneAndUpdate(
       {
-        fromUserId: requestId,
+        _id: requestId,
         toUserId: _id,
         status: "interested",
       },
