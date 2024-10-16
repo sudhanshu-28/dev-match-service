@@ -94,24 +94,27 @@ requestRouter.post("/review/:status/:requestId", userAuth, async (req, res) => {
       throw new Error(`Invalid status type: ${status}`);
     }
 
-    const connectionRequestUpdateData =
-      await ConnectionRequest.findOneAndUpdate(
-        {
-          fromUserId: requestId,
-          toUserId: _id,
-          status: "interested",
-        },
-        { status }
-      );
+    const connectionRequest = await ConnectionRequest.findOneAndUpdate(
+      {
+        fromUserId: requestId,
+        toUserId: _id,
+        status: "interested",
+      },
+      { status },
+      { returnDocument: "after", runValidators: true }
+    );
 
-    if (!connectionRequestUpdateData) {
-      throw new Error("Failed to accept / reject connection request.");
+    if (!connectionRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Connection request not found.",
+      });
     }
 
     res.json({
       success: true,
       message: "Connection request " + status + " successfully.",
-      data: connectionRequestUpdateData,
+      data: connectionRequest,
     });
   } catch (error) {
     res.status(400).json({
