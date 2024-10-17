@@ -59,11 +59,13 @@ userRouter.get("/connections", userAuth, async (req, res) => {
 
     // Customized Response
     const modifiedResponse = myConnections.map((connection) => {
-      const fromUserIdMatches = connection?.fromUserId?._id.equals(_id);
-      const toUserIdMatches = connection?.toUserId?._id.equals(_id);
+      if (connection?.fromUserId?._id.equals(_id)) {
+        return connection?.toUserId;
+      }
 
-      if (fromUserIdMatches) return connection?.toUserId;
-      if (toUserIdMatches) return connection?.fromUserId;
+      if (connection?.toUserId?._id.toString() === _id.toString()) {
+        return connection?.fromUserId;
+      }
 
       return {};
     });
