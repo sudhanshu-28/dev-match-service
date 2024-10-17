@@ -83,35 +83,37 @@ userRouter.get("/connections", userAuth, async (req, res) => {
 
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
-    const users = await User.find({});
-    const count = await User.countDocuments();
+    const { _id } = req?.user;
 
-    const usersList = users.map((user) => ({
-      _id: user?._id,
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      emailId: user?.emailId,
-      age: user?.age,
-      gender: user?.gender,
-    }));
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: _id }, { toUserId: _id }],
+    }).select("fromUserId toUserId");
 
-    if (usersList.length === 0) {
-      res.status(404).json({
-        success: false,
-        message: "Users not found.",
-      });
-    }
+    const hideUsersFromFeed = new Set();
+
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req?.fromUserId.toString());
+      hideUsersFromFeed.add(req?.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: _id } },
+      ],
+    })
+      .sort({ updatedAt: -1 })
+      .select(USER_SAFE_DATA);
 
     res.json({
       success: true,
-      message: "Users list fetched successfully.",
-      data: usersList,
-      totalUsers: count,
+      message: "Users fetched for the Feed successfully.",
+      data: users,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Something went wrong. Failed to fetch Users list.",
+      message: "Error: " + error?.message || error,
     });
   }
 });
