@@ -59,6 +59,8 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
         lastName: loggedInUser?.lastName,
         emailId: loggedInUser?.emailId,
         photoUrl: loggedInUser?.photoUrl,
+        age: loggedInUser?.age,
+        gender: loggedInUser?.gender,
         about: loggedInUser?.about,
         skills: loggedInUser?.skills,
       },

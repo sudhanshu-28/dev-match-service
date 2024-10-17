@@ -25,7 +25,7 @@ const validateSignInData = (req) => {
 
 const validateProfileEditData = (req) => {
   const userData = req?.body;
-  const { firstName, lastName, photoUrl } = userData;
+  const { photoUrl } = userData;
 
   const ALLOWED_EDIT_FIELDS = [
     "firstName",
@@ -45,9 +45,7 @@ const validateProfileEditData = (req) => {
     throw new Error("Invalid Edit request.");
   }
 
-  if (!firstName || !lastName) {
-    throw new Error("Name is not valid.");
-  } else if (!validator.isURL(photoUrl)) {
+  if (photoUrl && !validator.isURL(photoUrl)) {
     throw new Error("Invalid Photo URL: " + photoUrl);
   }
 };
