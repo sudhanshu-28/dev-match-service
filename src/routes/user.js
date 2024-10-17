@@ -27,8 +27,6 @@ userRouter.get("/requests/received", userAuth, async (req, res) => {
     //    Option 1: "firstName lastName photoUrl about skills"
     //    Option 2: ["firstName", "lastName", "photoUrl", "about", "skills"];
 
-    console.log(connectionRequests);
-
     res.json({
       success: true,
       message: "Connection Requests list fetched successfully.",
