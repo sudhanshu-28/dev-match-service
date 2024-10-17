@@ -7,6 +7,8 @@ const { userAuth } = require("../middlewares/auth");
 
 const userRouter = express.Router();
 
+const USER_SAFE_DATA = "firstName lastName photoUrl about skills age gender";
+
 userRouter.get("/requests/received", userAuth, async (req, res) => {
   try {
     const { _id } = req?.user;
@@ -36,6 +38,45 @@ userRouter.get("/requests/received", userAuth, async (req, res) => {
     res.status(400).json({
       status: false,
       message: "Error: " + error?.message,
+    });
+  }
+});
+
+userRouter.get("/connections", userAuth, async (req, res) => {
+  try {
+    const { _id } = req?.user;
+
+    const myConnections = await ConnectionRequest.find({
+      $or: [{ fromUserId: _id }, { toUserId: _id }],
+      status: "accepted",
+    })
+      .select("fromUserId toUserId status")
+      .populate("fromUserId", USER_SAFE_DATA) // 1st way to write
+      .populate({
+        path: "toUserId",
+        select: USER_SAFE_DATA,
+      }); // 2nd way to write
+
+    // Customized Response
+    const modifiedResponse = myConnections.map((connection) => {
+      const fromUserIdMatches = connection?.fromUserId?._id.equals(_id);
+      const toUserIdMatches = connection?.toUserId?._id.equals(_id);
+
+      if (fromUserIdMatches) return connection?.toUserId;
+      if (toUserIdMatches) return connection?.fromUserId;
+
+      return {};
+    });
+
+    res.json({
+      success: true,
+      message: "Connections fetched successfully.",
+      data: modifiedResponse,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error: " + error?.message || error,
     });
   }
 });
