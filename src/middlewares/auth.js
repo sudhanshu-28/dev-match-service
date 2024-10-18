@@ -32,7 +32,6 @@ const userAuth = async (req, res, next) => {
 };
 
 const adminAuth = (req, res, next) => {
-  console.log("Admin Auth is called");
   const token = "xyz";
   const isAdminAuthorized = token === "xyz";
 
