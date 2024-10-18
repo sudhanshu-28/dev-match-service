@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const connectDB = require("./config/database");
 
@@ -17,6 +18,7 @@ const app = express();
 
 // Convert JSON (Readable Stream) into Javascript Object for all the APIs request for all HTTP methods
 // Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
