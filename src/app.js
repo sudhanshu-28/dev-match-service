@@ -1,20 +1,40 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
+
+const connectDB = require("./config/database");
+
+const {
+  authRouter,
+  exampleRouter,
+  profileRouter,
+  requestRouter,
+  userRouter,
+} = require("./routes");
 
 const app = express();
 
-// This callback function passed inside use function is called Request Handler
-app.use("/test", (req, res) => {
-  res.send("Hello from the server");
-});
+// NEVER TRUST req.body => It can have malicious data
 
-app.use("/hello", (req, res) => {
-  res.send("Hello hello hello hello!");
-});
+// Convert JSON (Readable Stream) into Javascript Object for all the APIs request for all HTTP methods
+// Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
+app.use(express.json());
+app.use(cookieParser());
 
-app.use("/", (req, res) => {
-  res.send("Home Page");
-});
+app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
+app.use("/request", requestRouter);
+app.use("/user", userRouter);
+app.use("/example", exampleRouter);
 
-app.listen(7777, () => {
-  console.log("Server is running on port 7777...");
-});
+// Start your sever only when you are connected to Database
+connectDB()
+  .then(() => {
+    console.log("Database connection established...");
+    app.listen(7777, () => {
+      console.log("Server is running on Port:7777...");
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection failed.");
+    console.log(err);
+  });
