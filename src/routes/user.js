@@ -85,6 +85,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const { _id } = req?.user;
 
+    const page = parseInt(req?.query?.page) || 1;
+    const limit = parseInt(req?.query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const connectionRequests = await ConnectionRequest.find({
       $or: [{ fromUserId: _id }, { toUserId: _id }],
     }).select("fromUserId toUserId");
@@ -103,7 +107,9 @@ userRouter.get("/feed", userAuth, async (req, res) => {
       ],
     })
       .sort({ updatedAt: -1 })
-      .select(USER_SAFE_DATA);
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
 
     res.json({
       success: true,
