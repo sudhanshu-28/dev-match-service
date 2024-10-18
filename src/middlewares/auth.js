@@ -37,7 +37,10 @@ const adminAuth = (req, res, next) => {
   const isAdminAuthorized = token === "xyz";
 
   if (!isAdminAuthorized) {
-    res.status(401).json("Unauthorized User");
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized User",
+    });
   } else {
     next();
   }
