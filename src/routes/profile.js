@@ -18,13 +18,32 @@ profileRouter.get("/view", userAuth, async (req, res) => {
       throw new Error("Authentication failed. User details not found.");
     }
 
-    const { _id, firstName, lastName, emailId, photoUrl, about, skills } =
-      req?.user;
+    const {
+      _id,
+      firstName,
+      lastName,
+      emailId,
+      photoUrl,
+      about,
+      skills,
+      age,
+      gender,
+    } = req?.user;
 
     res.json({
       success: true,
       message: "Profile fetched successfully.",
-      data: { _id, firstName, lastName, emailId, photoUrl, about, skills },
+      data: {
+        _id,
+        firstName,
+        lastName,
+        emailId,
+        photoUrl,
+        about,
+        skills,
+        age,
+        gender,
+      },
     });
   } catch (error) {
     res.status(400).json({
