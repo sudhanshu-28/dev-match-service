@@ -2,7 +2,11 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
-const { validateSignUpData, validateSignInData } = require("../utils");
+const {
+  validateSignUpData,
+  validateSignInData,
+  deepClone,
+} = require("../utils");
 
 const authRouter = express.Router();
 
@@ -46,11 +50,11 @@ authRouter.post("/login", async (req, res) => {
 
     const { emailId, password } = req?.body;
 
-    const user = await User.findOne({ emailId });
+    const user = await User.findOne({ emailId }).select(
+      "-createdAt -updatedAt -__v"
+    );
 
     if (user) {
-      const { _id, password: passwordHash } = user;
-
       if (user?.password) {
         const isPasswordValid = await user.validatePassword(password);
 
@@ -60,15 +64,19 @@ authRouter.post("/login", async (req, res) => {
 
           // maxAge takes value in milliseconds
           // expires takes value in specific date
-
           res.cookie("token", token, {
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
           });
 
+          // Response data format
+          const safeData = deepClone(user);
+          delete safeData.password;
+
           res.json({
             success: true,
             message: "Logged In successfully!",
+            data: safeData,
           });
         } else {
           throw new Error("Invalid credentials.");
