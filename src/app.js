@@ -14,11 +14,16 @@ const {
 
 const app = express();
 
-// NEVER TRUST req.body => It can have malicious data
+app.use(
+  cors({
+    origin: "http://localhost:5173", // White listing this domain name
+    credentials: true,
+  })
+);
 
+// NEVER TRUST req.body => It can have malicious data
 // Convert JSON (Readable Stream) into Javascript Object for all the APIs request for all HTTP methods
 // Dont pass routes if Request Handler / Middleware needs to be applied for all APIs
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
