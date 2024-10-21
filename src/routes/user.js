@@ -20,7 +20,7 @@ userRouter.get("/requests/received", userAuth, async (req, res) => {
       .select("fromUserId") // Only fields i want to extract from each document
       .populate(
         "fromUserId", // It will populate all data fromUserId for connected/refered Collection
-        "firstName lastName photoUrl about" // Specify fields which we want to extract
+        USER_SAFE_DATA
       );
 
     // Either pass all fields in array or pass as single string with space seperated
