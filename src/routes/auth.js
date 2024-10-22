@@ -2,7 +2,11 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
-const { validateSignUpData, validateSignInData } = require("../utils");
+const {
+  validateSignUpData,
+  validateSignInData,
+  deepClone,
+} = require("../utils");
 
 const authRouter = express.Router();
 
@@ -19,18 +23,40 @@ authRouter.post("/signup", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Creating new instance of User model
-    const user = new User({
+    const newUser = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
     });
 
-    await user.save();
+    // Create User
+    const savedUser = await newUser.save();
+
+    if (!savedUser) {
+      throw new Error("Failed to create User account. Please try again.");
+    }
+
+    // Generate token
+    const token = await savedUser.getJWT();
+
+    // Set cookies
+    res.cookie("token", token, {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
+    });
+
+    // Response data format
+    const safeData = deepClone(savedUser);
+    delete safeData.password;
+    delete safeData.createdAt;
+    delete safeData.updatedAt;
+    delete safeData.__v;
 
     res.json({
       success: true,
       message: "User added successfully!",
+      data: safeData,
     });
   } catch (error) {
     res.status(400).json({
@@ -46,11 +72,11 @@ authRouter.post("/login", async (req, res) => {
 
     const { emailId, password } = req?.body;
 
-    const user = await User.findOne({ emailId });
+    const user = await User.findOne({ emailId }).select(
+      "-createdAt -updatedAt -__v"
+    );
 
     if (user) {
-      const { _id, password: passwordHash } = user;
-
       if (user?.password) {
         const isPasswordValid = await user.validatePassword(password);
 
@@ -60,15 +86,19 @@ authRouter.post("/login", async (req, res) => {
 
           // maxAge takes value in milliseconds
           // expires takes value in specific date
-
           res.cookie("token", token, {
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
           });
 
+          // Response data format
+          const safeData = deepClone(user);
+          delete safeData.password;
+
           res.json({
             success: true,
             message: "Logged In successfully!",
+            data: safeData,
           });
         } else {
           throw new Error("Invalid credentials.");
