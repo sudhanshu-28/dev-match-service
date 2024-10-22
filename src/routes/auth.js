@@ -23,18 +23,40 @@ authRouter.post("/signup", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Creating new instance of User model
-    const user = new User({
+    const newUser = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
     });
 
-    await user.save();
+    // Create User
+    const user = await newUser.save();
+
+    if (!user) {
+      throw new Error("Failed to create User account. Please try again.");
+    }
+
+    // Generate token
+    const token = await user.getJWT();
+
+    // Set cookies
+    res.cookie("token", token, {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // current time + 1 day
+    });
+
+    // Response data format
+    const safeData = deepClone(user);
+    delete safeData.password;
+    delete safeData.createdAt;
+    delete safeData.updatedAt;
+    delete safeData.__v;
 
     res.json({
       success: true,
       message: "User added successfully!",
+      data: safeData,
     });
   } catch (error) {
     res.status(400).json({
