@@ -31,14 +31,14 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     // Create User
-    const user = await newUser.save();
+    const savedUser = await newUser.save();
 
-    if (!user) {
+    if (!savedUser) {
       throw new Error("Failed to create User account. Please try again.");
     }
 
     // Generate token
-    const token = await user.getJWT();
+    const token = await savedUser.getJWT();
 
     // Set cookies
     res.cookie("token", token, {
@@ -47,7 +47,7 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     // Response data format
-    const safeData = deepClone(user);
+    const safeData = deepClone(savedUser);
     delete safeData.password;
     delete safeData.createdAt;
     delete safeData.updatedAt;
